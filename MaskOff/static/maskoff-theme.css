@@ -1,0 +1,419 @@
+/* Site-wide theme bridge — works with theme.js on every page */
+html.maskoff-themed {
+  color-scheme: light;
+}
+
+html.maskoff-themed[data-theme="dark"],
+html.maskoff-themed[data-theme="neon"] {
+  color-scheme: dark;
+}
+
+html.maskoff-themed body {
+  background: var(--bg) !important;
+  color: var(--text) !important;
+  transition: background 0.35s ease, color 0.35s ease;
+}
+
+html.maskoff-themed body.page-history {
+  background: var(--bg) !important;
+  padding-top: 85px;
+}
+
+html.maskoff-themed body.page-history .history-card {
+  color: var(--text) !important;
+}
+
+html.maskoff-no-animations *,
+html.maskoff-no-animations *::before,
+html.maskoff-no-animations *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+html.maskoff-animations .card,
+html.maskoff-animations .history-card,
+html.maskoff-animations .preview-panel,
+html.maskoff-animations button,
+html.maskoff-animations .sidebar a {
+  transition: transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease, border-color 0.22s ease;
+}
+
+html.maskoff-animations .card:hover,
+html.maskoff-animations .history-card:hover {
+  transform: translateY(-2px);
+}
+
+html.maskoff-compact .container,
+html.maskoff-compact .content {
+  padding-top: 18px !important;
+  padding-bottom: 24px !important;
+}
+
+html.maskoff-compact .card,
+html.maskoff-compact .history-card {
+  padding: 16px !important;
+  margin-bottom: 14px !important;
+}
+
+html.maskoff-compact .header h2,
+html.maskoff-compact .hero h1 {
+  font-size: 1.65rem !important;
+}
+
+html.maskoff-compact .navbar {
+  height: 58px !important;
+  min-height: 58px !important;
+}
+
+html.maskoff-compact .sidebar {
+  width: 200px !important;
+  padding: 16px !important;
+}
+
+html.maskoff-themed .navbar,
+html.maskoff-themed .navbar-right,
+html.maskoff-themed nav.navbar {
+  background: var(--nav-bg) !important;
+  color: var(--button-text, #fff) !important;
+}
+
+html.maskoff-themed .navbar a,
+html.maskoff-themed .navbar button,
+html.maskoff-themed .navbar-right a,
+html.maskoff-themed .navbar-right button,
+html.maskoff-themed .nav-link {
+  color: var(--button-text, #fff) !important;
+}
+
+html.maskoff-themed .btn-nav-home {
+  background: transparent !important;
+  color: #ffffff !important;
+  border: 2px solid rgba(255, 255, 255, 0.85) !important;
+}
+
+html.maskoff-themed .btn-nav-home:hover {
+  background: #ffffff !important;
+  color: var(--accent) !important;
+}
+
+html.maskoff-themed .back-btn {
+  background: var(--button-bg) !important;
+  color: var(--button-text, #fff) !important;
+  border: none !important;
+  text-decoration: none !important;
+}
+
+html.maskoff-themed footer {
+  background: var(--nav-bg) !important;
+  color: var(--button-text, #fff) !important;
+}
+
+html.maskoff-themed .header,
+html.maskoff-themed .container > .header {
+  color: var(--text) !important;
+}
+
+html.maskoff-themed .header p,
+html.maskoff-themed .header h2 + p {
+  color: var(--muted) !important;
+  opacity: 1 !important;
+}
+
+html.maskoff-themed .card,
+html.maskoff-themed .history-card,
+html.maskoff-themed .preview-panel,
+html.maskoff-themed .upload-card,
+html.maskoff-themed .results {
+  background: var(--card) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+html.maskoff-themed .sidebar {
+  background: var(--card) !important;
+  border-color: var(--border) !important;
+}
+
+html.maskoff-themed .sidebar a.active,
+html.maskoff-themed .sidebar a:hover {
+  background: var(--accent-soft) !important;
+  color: var(--accent) !important;
+}
+
+html.maskoff-themed button.primary,
+html.maskoff-themed .primary,
+html.maskoff-themed .submit-btn,
+html.maskoff-themed .search-bar button,
+html.maskoff-themed .btn-dark {
+  background: var(--button-bg) !important;
+  color: var(--button-text) !important;
+  border-color: var(--button-bg) !important;
+}
+
+html.maskoff-themed input,
+html.maskoff-themed select,
+html.maskoff-themed textarea {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+
+/* Toast notifications */
+#maskoff-toast-root {
+  position: fixed;
+  top: 88px;
+  right: 20px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+  max-width: min(380px, calc(100vw - 32px));
+}
+
+.maskoff-toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  animation: maskoff-toast-in 0.35s ease;
+}
+
+.maskoff-toast strong {
+  display: block;
+  font-size: 0.92rem;
+  margin-bottom: 2px;
+}
+
+.maskoff-toast span {
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.maskoff-toast-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+@keyframes maskoff-toast-in {
+  from { opacity: 0; transform: translateX(12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes maskoff-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.72; }
+}
+
+html.maskoff-animations .maskoff-refresh-pulse {
+  animation: maskoff-pulse 0.6s ease;
+}
+
+/* Settings page components */
+.maskoff-switch {
+  position: relative;
+  width: 52px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.maskoff-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.maskoff-switch-slider {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+  background: var(--border);
+  border-radius: 999px;
+  transition: background 0.25s ease;
+}
+
+.maskoff-switch-slider::before {
+  content: "";
+  position: absolute;
+  height: 22px;
+  width: 22px;
+  left: 3px;
+  bottom: 3px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.25s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.maskoff-switch input:checked + .maskoff-switch-slider {
+  background: var(--button-bg);
+}
+
+.maskoff-switch input:checked + .maskoff-switch-slider::before {
+  transform: translateX(24px);
+}
+
+.settings-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.settings-status-pill::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.settings-status-pill.is-live {
+  background: #ecfdf5;
+  color: #047857;
+  animation: maskoff-pulse 2s ease infinite;
+}
+
+.settings-status-pill.is-live::before {
+  background: #10b981;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.25);
+}
+
+.toggle-row.is-on {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+  background: color-mix(in srgb, var(--accent-soft) 55%, var(--panel));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.notifications-active-panel {
+  margin-top: 16px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  border: 1px solid #a7f3d0;
+  background: linear-gradient(135deg, #ecfdf5, #f0fdf4);
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.notifications-active-panel[hidden] {
+  display: none !important;
+}
+
+.notifications-active-panel .panel-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: #10b981;
+  color: white;
+  display: grid;
+  place-items: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.notifications-active-panel strong {
+  display: block;
+  color: #065f46;
+  margin-bottom: 4px;
+}
+
+.notifications-active-panel p {
+  margin: 0;
+  font-size: 0.84rem;
+  color: #047857;
+  line-height: 1.5;
+}
+
+.settings-notif-bell {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 10px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #ecfdf5;
+  color: #047857;
+  font-size: 0.75rem;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+.settings-notif-bell[hidden] {
+  display: none !important;
+}
+
+html.maskoff-notifications-live .page-dashboard::after,
+html.maskoff-notifications-live .page-settings::after {
+  content: none;
+}
+
+/* Unified top navigation buttons */
+.maskoff-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 88px;
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.maskoff-nav-home {
+  background: transparent !important;
+  color: #ffffff !important;
+  border: 2px solid rgba(255, 255, 255, 0.85) !important;
+}
+
+.maskoff-nav-home:hover {
+  background: #ffffff !important;
+  color: var(--accent, #5e3c66) !important;
+}
+
+.maskoff-nav-logout {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #ffffff !important;
+  border: 2px solid rgba(255, 255, 255, 0.35) !important;
+}
+
+.maskoff-nav-logout:hover {
+  background: rgba(255, 255, 255, 0.22) !important;
+}
+
+.maskoff-navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.maskoff-page-pad {
+  padding-top: 72px;
+}

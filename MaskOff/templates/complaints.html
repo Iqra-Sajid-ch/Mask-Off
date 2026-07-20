@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Complaint Portal | Mask Off</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='maskoff-theme.css') }}">
+<script src="{{ url_for('static', filename='theme.js') }}"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
+body { min-height: 100vh; display: flex; flex-direction: column; background: var(--bg); color: var(--text); padding-top: 72px; }
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1100;
+  height: 88px; background: var(--nav-bg, var(--accent, #5e3c66)); display: flex; align-items: center;
+  justify-content: space-between; padding: 0 32px; box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+.logo-container { display: flex; align-items: center; gap: 14px; cursor: pointer; }
+.logo-img { height: 76px; width: auto; }
+.logo-text { font-size: 32px; font-weight: 800; color: var(--white); letter-spacing: 0.5px; }
+.navbar-right { display: flex; align-items: center; gap: 12px; }
+.navbar-right a, .navbar-right button {
+  color: var(--white); text-decoration: none; font-weight: 600; padding: 8px 14px;
+  border-radius: 10px; border: 1px solid rgba(255,255,255,0.25); background: transparent; cursor: pointer;
+}
+.navbar-right a:hover, .navbar-right button:hover { background: rgba(255,255,255,0.14); }
+.page { flex: 1; max-width: 1140px; margin: 0 auto; padding: 36px 24px 56px; width: 100%; }
+.page-header { margin-bottom: 28px; }
+.page-header h1 { font-size: clamp(1.75rem, 3vw, 2.35rem); font-weight: 800; margin-bottom: 8px; }
+.page-header p { color: var(--muted); line-height: 1.65; max-width: 720px; }
+.grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 24px; align-items: start; }
+.card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+  padding: 26px; box-shadow: var(--shadow); margin-bottom: 20px;
+}
+.card h2, .card h3 { font-size: 1.1rem; margin-bottom: 6px; }
+.card .sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 20px; line-height: 1.55; }
+.field { margin-bottom: 18px; }
+.field label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--muted); margin-bottom: 8px; }
+.field select, .field input, .field textarea {
+  width: 100%; padding: 13px 14px; border-radius: 12px; border: 1px solid var(--border);
+  background: var(--surface); color: var(--text); font-size: 0.95rem;
+}
+.field textarea { min-height: 140px; resize: vertical; font-family: inherit; }
+.field select:focus, .field input:focus, .field textarea:focus {
+  outline: none; border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+.btn {
+  padding: 12px 18px; border-radius: 12px; font-weight: 700; font-size: 0.9rem; cursor: pointer; border: none;
+  text-decoration: none; display: inline-flex; align-items: center; justify-content: center;
+}
+.btn-primary { background: var(--button-bg); color: var(--button-text); }
+.btn-ghost { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+.escalation-box {
+  border-radius: 16px; padding: 18px; background: var(--panel); border: 1px solid var(--border);
+  margin-top: 16px;
+}
+.escalation-box strong { display: block; margin-bottom: 6px; }
+.escalation-box p { color: var(--muted); font-size: 0.88rem; line-height: 1.55; margin-bottom: 12px; }
+.status-banner {
+  display: none; margin-bottom: 18px; padding: 14px 16px; border-radius: 12px; font-size: 0.92rem;
+}
+.status-banner.success { display: block; background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+.status-banner.error { display: block; background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+footer {
+  text-align: center; padding: 20px; background: var(--nav-bg); color: var(--white); font-size: 0.88rem;
+}
+@media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body class="page-complaints">
+
+<nav class="navbar">
+  <div class="logo-container" onclick="window.location.href='/'">
+    <img src="{{ url_for('static', filename='final logo.png') }}" alt="Mask Off Logo" class="logo-img">
+    <span class="logo-text">Mask Off</span>
+  </div>
+  <div class="navbar-right maskoff-navbar-right">
+    <a href="/" class="maskoff-nav-btn maskoff-nav-home">Home</a>
+    <button type="button" class="maskoff-nav-btn maskoff-nav-logout" id="logoutBtn">Logout</button>
+  </div>
+</nav>
+
+<main class="page">
+  <header class="page-header">
+    <h1>Complaint Portal</h1>
+    <p>Submit a formal complaint about technical problems, incorrect detection results, or platform concerns. For urgent national cyber crime matters, escalate to NCCIA using the helpdesk contacts on the right.</p>
+  </header>
+
+  <div id="formStatus" class="status-banner" role="status"></div>
+
+  <div class="grid">
+    <section>
+      <article class="card">
+        <h3>Submit a complaint</h3>
+        <p class="sub">All fields marked below are required unless noted. Your complaint is stored securely and reviewed by the Mask Off team.</p>
+
+        <form id="complaintForm">
+          <div class="field">
+            <label for="complaintName">Your name</label>
+            <input id="complaintName" type="text" value="{{ user_name }}" required maxlength="120">
+          </div>
+          <div class="field">
+            <label for="complaintEmail">Email</label>
+            <input id="complaintEmail" type="email" value="{{ user_email }}" required maxlength="255">
+          </div>
+          <div class="field">
+            <label for="complaintCategory">Complaint type</label>
+            <select id="complaintCategory" required>
+              <option value="">Select a category</option>
+              <option value="technical">Technical issue</option>
+              <option value="incorrect_detection">Incorrect detection result</option>
+              <option value="platform">Platform / account concern</option>
+              <option value="privacy">Privacy or data concern</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="complaintDetectionId">Related detection ID (optional)</label>
+            <input id="complaintDetectionId" type="number" min="1" placeholder="e.g. 42 — from History page">
+          </div>
+          <div class="field">
+            <label for="complaintSubject">Subject</label>
+            <input id="complaintSubject" type="text" required maxlength="255" placeholder="Brief summary of your complaint">
+          </div>
+          <div class="field">
+            <label for="complaintMessage">Details</label>
+            <textarea id="complaintMessage" required maxlength="5000" placeholder="Describe what happened, when it occurred, and what outcome you expect."></textarea>
+          </div>
+          <div class="btn-row">
+            <button type="submit" class="btn btn-primary" id="submitComplaintBtn">Submit Complaint</button>
+            <a href="/" class="btn btn-ghost">Home</a>
+          </div>
+        </form>
+      </article>
+    </section>
+
+    <section>
+      <article class="card">
+        <h3>Support &amp; Escalation</h3>
+        <p class="sub">For urgent issues, official feedback, or cyber crime escalation, contact the National Cyber Crime Investigation Agency (NCCIA).</p>
+        <div class="escalation-box">
+          <strong>NCCIA Helpdesk</strong>
+          <p>Email the national helpdesk or visit the official portal for formal support and escalation.</p>
+          <div class="btn-row">
+            <a class="btn btn-primary"
+               href="mailto:{{ nccia_email }}?subject=Mask%20Off%20Complaint%20%2F%20Support">
+              Email {{ nccia_email }}
+            </a>
+            <a class="btn btn-ghost" href="{{ nccia_url }}" target="_blank" rel="noopener noreferrer">
+              Visit NCCIA Portal
+            </a>
+          </div>
+        </div>
+      </article>
+
+    </section>
+  </div>
+</main>
+
+<footer>© 2026 Mask Off · Complaints reviewed by the platform team</footer>
+
+<script>
+document.getElementById('logoutBtn').onclick = () => {
+  if (window.MaskOff) MaskOff.clearSessionStorageOnly();
+  window.location.href = '/logout';
+};
+
+const params = new URLSearchParams(window.location.search);
+const prefillDetection = params.get('detection_id');
+if (prefillDetection) {
+  document.getElementById('complaintDetectionId').value = prefillDetection;
+}
+const prefillCategory = params.get('category');
+if (prefillCategory) {
+  const cat = document.getElementById('complaintCategory');
+  if ([...cat.options].some((o) => o.value === prefillCategory)) {
+    cat.value = prefillCategory;
+  }
+}
+
+function showStatus(message, type) {
+  const el = document.getElementById('formStatus');
+  el.textContent = message;
+  el.className = 'status-banner ' + type;
+}
+
+document.getElementById('complaintForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('submitComplaintBtn');
+  btn.disabled = true;
+
+  const payload = {
+    name: document.getElementById('complaintName').value.trim(),
+    email: document.getElementById('complaintEmail').value.trim(),
+    category: document.getElementById('complaintCategory').value,
+    subject: document.getElementById('complaintSubject').value.trim(),
+    message: document.getElementById('complaintMessage').value.trim(),
+    detection_id: document.getElementById('complaintDetectionId').value || null,
+  };
+
+  try {
+    const res = await fetch('/api/submit-complaint', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      showStatus(data.error || 'Could not submit complaint.', 'error');
+      return;
+    }
+    showStatus(
+      data.message + (data.complaint_id ? ' Reference #' + data.complaint_id + '.' : ''),
+      'success'
+    );
+    document.getElementById('complaintForm').reset();
+    document.getElementById('complaintName').value = '{{ user_name }}';
+    document.getElementById('complaintEmail').value = '{{ user_email }}';
+    if (window.MaskOff) {
+      MaskOff.showToast('Complaint submitted', 'Reference #' + data.complaint_id, { force: true });
+    }
+  } catch (err) {
+    showStatus('Network error. Please try again.', 'error');
+  } finally {
+    btn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>

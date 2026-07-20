@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings | Mask Off</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='maskoff-theme.css') }}">
+<script src="{{ url_for('static', filename='theme.js') }}"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
+body { min-height: 100vh; display: flex; flex-direction: column; background: var(--bg); color: var(--text); padding-top: 72px; }
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1100;
+  height: 88px; background: var(--nav-bg, var(--accent, #5e3c66)); display: flex; align-items: center;
+  justify-content: space-between; padding: 0 32px; box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+.logo-container { display: flex; align-items: center; gap: 14px; cursor: pointer; }
+.logo-img { height: 76px; width: auto; }
+.logo-text { font-size: 32px; font-weight: 800; color: var(--white); letter-spacing: 0.5px; }
+.navbar-right { display: flex; align-items: center; gap: 12px; }
+.navbar-right a, .navbar-right button {
+  color: var(--white); text-decoration: none; font-weight: 600; padding: 8px 14px;
+  border-radius: 10px; border: 1px solid rgba(255,255,255,0.25); background: transparent; cursor: pointer;
+}
+.navbar-right a:hover, .navbar-right button:hover { background: rgba(255,255,255,0.14); }
+.page { flex: 1; max-width: 1140px; margin: 0 auto; padding: 36px 24px 56px; width: 100%; }
+.page-header { margin-bottom: 28px; }
+.page-header h1 { font-size: clamp(1.75rem, 3vw, 2.35rem); font-weight: 800; margin-bottom: 8px; }
+.page-header p { color: var(--muted); line-height: 1.65; max-width: 620px; }
+.grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: 24px; align-items: start; }
+.card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+  padding: 26px; box-shadow: var(--shadow); margin-bottom: 20px;
+}
+.card h2, .card h3 { font-size: 1.1rem; margin-bottom: 6px; }
+.card .sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 20px; line-height: 1.55; }
+.field { margin-bottom: 18px; }
+.field label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--muted); margin-bottom: 8px; }
+.field select, .field input {
+  width: 100%; padding: 13px 14px; border-radius: 12px; border: 1px solid var(--border);
+  background: var(--surface); color: var(--text); font-size: 0.95rem;
+}
+.field select:focus, .field input:focus {
+  outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+.accent-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.accent-swatch {
+  border: 2px solid transparent; border-radius: 14px; min-height: 52px; cursor: pointer;
+  color: #fff; font-weight: 700; font-size: 0.78rem; transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.accent-swatch:hover { transform: translateY(-2px); }
+.accent-swatch.active { border-color: var(--text); box-shadow: 0 8px 20px rgba(0,0,0,0.18); }
+.accent-swatch[data-accent-color="#5e3c66"] { background: #5e3c66; }
+.accent-swatch[data-accent-color="#2563eb"] { background: #2563eb; }
+.accent-swatch[data-accent-color="#10b981"] { background: #10b981; }
+.accent-swatch[data-accent-color="#f97316"] { background: #f97316; }
+.accent-swatch[data-accent-color="#e11d48"] { background: #e11d48; }
+.accent-swatch[data-accent-color="#047857"] { background: #047857; }
+.toggle-list { display: grid; gap: 12px; }
+.toggle-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 16px 18px; border-radius: 16px; background: var(--panel); border: 1px solid var(--border);
+}
+.toggle-row strong { display: block; font-size: 0.95rem; margin-bottom: 3px; }
+.toggle-row small { color: var(--muted); font-size: 0.82rem; line-height: 1.45; }
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+.btn {
+  padding: 12px 18px; border-radius: 12px; font-weight: 700; font-size: 0.9rem; cursor: pointer; border: none;
+}
+.btn-primary { background: var(--button-bg); color: var(--button-text); }
+.btn-ghost { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+.account-saved-note {
+  margin-top: 12px;
+  font-size: 0.85rem;
+  color: var(--muted);
+  min-height: 1.2em;
+}
+.account-saved-note.is-saved { color: #047857; font-weight: 600; }
+footer {
+  text-align: center; padding: 20px; background: var(--nav-bg); color: var(--white); font-size: 0.88rem;
+}
+#logoutModal {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+  align-items: center; justify-content: center; z-index: 9999;
+}
+#logoutModal .modal-card {
+  background: var(--card); padding: 28px; border-radius: 20px; width: min(400px, 92vw);
+  text-align: center; border: 1px solid var(--border); box-shadow: var(--shadow);
+}
+.modal-actions { display: flex; justify-content: center; gap: 10px; margin-top: 18px; }
+.modal-actions button { padding: 11px 18px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; }
+.cancel-btn { background: var(--panel); color: var(--text); }
+.confirm-btn { background: var(--button-bg); color: var(--button-text); }
+@media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body class="page-settings">
+
+<nav class="navbar">
+  <div class="logo-container" onclick="window.location.href='/'">
+    <img src="{{ url_for('static', filename='final logo.png') }}" alt="Mask Off Logo" class="logo-img">
+    <span class="logo-text">Mask Off</span>
+  </div>
+  <div class="navbar-right maskoff-navbar-right">
+    <a href="/" class="maskoff-nav-btn maskoff-nav-home">Home</a>
+    <button type="button" class="maskoff-nav-btn maskoff-nav-logout" id="logoutBtn">Logout</button>
+  </div>
+</nav>
+
+<main class="page">
+  <header class="page-header">
+    <h1>Settings
+      <span class="settings-notif-bell" id="settingsNotifBell" hidden>🔔 Alerts on</span>
+    </h1>
+    <p>Customize appearance and behavior. Changes apply instantly across every page and are saved in your browser.</p>
+    <p class="settings-status-pill" id="settingsLiveStatus" style="margin-top:14px;">Loading…</p>
+  </header>
+
+  <div class="grid">
+    <section>
+      <article class="card">
+        <h3>Theme studio</h3>
+        <p class="sub">Choose a visual style and accent. Applied site-wide immediately.</p>
+        <div class="field">
+          <label for="themeSelect">Theme style</label>
+          <select id="themeSelect">
+            <option value="default">Modern Purple</option>
+            <option value="calm">Calm Blue</option>
+            <option value="dark">Night Mode</option>
+            <option value="neon">Neon Pulse</option>
+            <option value="rose">Rose Quartz</option>
+            <option value="forest">Forest Green</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Accent color</label>
+          <div class="accent-grid">
+            <button type="button" class="accent-swatch" data-accent-color="#5e3c66">Purple</button>
+            <button type="button" class="accent-swatch" data-accent-color="#2563eb">Blue</button>
+            <button type="button" class="accent-swatch" data-accent-color="#10b981">Mint</button>
+            <button type="button" class="accent-swatch" data-accent-color="#f97316">Coral</button>
+            <button type="button" class="accent-swatch" data-accent-color="#e11d48">Rose</button>
+            <button type="button" class="accent-swatch" data-accent-color="#047857">Forest</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <h3>Experience</h3>
+        <p class="sub">Toggles take effect immediately on all Mask Off pages.</p>
+        <div class="toggle-list">
+          <div class="toggle-row">
+            <div>
+              <strong>Notifications</strong>
+              <small>In-app toasts + desktop alerts when scans finish</small>
+            </div>
+            <label class="maskoff-switch">
+              <input type="checkbox" id="notificationsToggle">
+              <span class="maskoff-switch-slider"></span>
+            </label>
+          </div>
+          <div class="notifications-active-panel" id="notificationsActivePanel" hidden>
+            <div class="panel-icon" aria-hidden="true">🔔</div>
+            <div>
+              <strong>Notifications are active</strong>
+              <p>You will get in-app toasts when image/video scans finish and when history refreshes. Desktop alerts appear if your browser allows them.</p>
+            </div>
+          </div>
+          <div class="toggle-row">
+            <div>
+              <strong>Auto-refresh history</strong>
+              <small>History page reloads every 45 seconds when enabled</small>
+            </div>
+            <label class="maskoff-switch">
+              <input type="checkbox" id="autorefreshToggle">
+              <span class="maskoff-switch-slider"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <div>
+              <strong>Page animations</strong>
+              <small>Smooth hover and transition effects</small>
+            </div>
+            <label class="maskoff-switch">
+              <input type="checkbox" id="animationsToggle" checked>
+              <span class="maskoff-switch-slider"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <div>
+              <strong>Compact layout</strong>
+              <small>Denser cards and navigation on dashboard pages</small>
+            </div>
+            <label class="maskoff-switch">
+              <input type="checkbox" id="compactToggle">
+              <span class="maskoff-switch-slider"></span>
+            </label>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section>
+      <article class="card">
+        <h3>Account display</h3>
+        <p class="sub">Your display name appears on the dashboard greeting. Saved on this device and synced when you log in.</p>
+        <div class="field">
+          <label for="usernameInput">Display name</label>
+          <input id="usernameInput" type="text" placeholder="Your name" autocomplete="name">
+        </div>
+        <div class="field">
+          <label for="emailInput">Email</label>
+          <input id="emailInput" type="email" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="btn-row">
+          <button type="button" class="btn btn-primary" id="saveAccountBtn">Save account</button>
+        </div>
+        <p class="account-saved-note" id="accountSavedNote" aria-live="polite"></p>
+      </article>
+    </section>
+  </div>
+</main>
+
+<footer>© 2026 Mask Off · Preferences saved in your browser</footer>
+
+<div id="logoutModal">
+  <div class="modal-card">
+    <h3>Confirm logout</h3>
+    <p style="color:var(--muted);margin:10px 0 0;">Your theme settings will be kept.</p>
+    <div class="modal-actions">
+      <button type="button" class="cancel-btn" id="cancelLogout">Cancel</button>
+      <button type="button" class="confirm-btn" id="confirmLogout">Logout</button>
+    </div>
+  </div>
+</div>
+
+<script>
+document.getElementById('logoutBtn').onclick = () => {
+  document.getElementById('logoutModal').style.display = 'flex';
+};
+document.getElementById('cancelLogout').onclick = () => {
+  document.getElementById('logoutModal').style.display = 'none';
+};
+document.getElementById('confirmLogout').onclick = () => {
+  if (window.MaskOff) MaskOff.clearSessionStorageOnly();
+  window.location.href = '/logout';
+};
+</script>
+</body>
+</html>

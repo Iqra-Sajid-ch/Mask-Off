@@ -1,0 +1,1393 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard | Mask Off</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='maskoff-theme.css') }}">
+<script src="{{ url_for('static', filename='theme.js') }}"></script>
+<style>
+:root {
+  --accent:#5e3c66;
+  --accent-dark:#4a2f52;
+  --text:#2f1b35;
+  --muted:#7a5c83;
+  --bg:#f6f7fb;
+  --card:#ffffff;
+  --border:#e5e7eb;
+  --shadow:rgba(0,0,0,0.08);
+}
+
+/* Reset */
+* {
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Inter, system-ui, sans-serif;
+}
+
+body {
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+
+/* ================= NAVBAR ================= */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1100;
+  height:88px;
+  padding:0 24px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:var(--accent);
+  color:white;
+  box-shadow:0 6px 20px rgba(0,0,0,0.2);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.logo-img {
+  height: 76px;
+  width: auto;
+}
+
+.logo-text {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+#sidebarToggle {
+  font-size:24px;
+  cursor:pointer;
+}
+
+.navbar-right {
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.navbar-right span {
+  font-size:14px;
+  opacity:0.9;
+}
+
+.navbar-right a,
+.navbar-right button {
+  background:transparent;
+  color:white;
+  border:1px solid rgba(255,255,255,0.35);
+  padding:8px 16px;
+  border-radius:8px;
+  font-weight:600;
+  cursor:pointer;
+  text-decoration:none;
+}
+
+.navbar-right a:hover,
+.navbar-right button:hover {
+  background:rgba(255,255,255,0.18);
+}
+
+/* ================= LAYOUT ================= */
+.layout {
+  display:flex;
+  flex:1;
+  position:relative;
+  padding-top:72px;
+  min-height:calc(100vh - 72px);
+}
+
+/* ================= SIDEBAR ================= */
+.sidebar {
+  width:240px;
+  background:var(--card);
+  border-right:1px solid var(--border);
+  padding:26px 20px;
+  position:fixed;
+  top:72px;
+  left:-260px;
+  height:calc(100vh - 72px);
+  overflow-y:auto;
+  overflow-x:hidden;
+  overscroll-behavior:contain;
+  transition:left 0.3s ease;
+  z-index:1000;
+}
+
+.sidebar.show {
+  left:0;
+}
+
+.sidebar a {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:12px 14px;
+  margin-bottom:10px;
+  text-decoration:none;
+  color:var(--muted);
+  border-radius:12px;
+  font-weight:600;
+}
+
+.sidebar a.active,
+.sidebar a:hover {
+  background:#f3eef6;
+  color:var(--accent);
+}
+
+/* ================= CONTENT ================= */
+.content {
+  flex:1;
+  padding:36px;
+  transition: margin-left 0.3s;
+  margin-left:0;
+  min-width:0;
+  width:100%;
+}
+
+.content.shift {
+  margin-left:240px;
+}
+
+/* ================= HERO (legacy — overridden by welcome section) ================= */
+.cards {
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(200px,1fr));
+  gap:22px;
+  margin-bottom:36px;
+}
+
+.card {
+  background:var(--card);
+  padding:22px;
+  border-radius:18px;
+  border:1px solid var(--border);
+  box-shadow:0 10px 25px var(--shadow);
+}
+
+.card h4 {
+  margin-bottom:8px;
+  color:var(--accent);
+}
+
+.card strong {
+  font-size:24px;
+}
+
+/* ================= PREVIEW SECTION ================= */
+.preview-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(280px,1fr));
+  gap:24px;
+  margin-bottom:36px;
+}
+
+.preview {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.preview img,
+.preview video {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+}
+
+@media (max-width: 600px) {
+  .preview-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.preview h4 {
+  margin:10px 0 4px;
+  color:var(--accent);
+}
+
+/* ================= TABLE ================= */
+.table-container {
+  overflow-x:auto;
+}
+
+table {
+  width:100%;
+  border-collapse:collapse;
+  margin-top:16px;
+}
+
+th, td {
+  padding:14px;
+  border-bottom:1px solid var(--border);
+}
+
+th {
+  color:var(--muted);
+  font-size:14px;
+}
+
+tr:hover {
+  background:#faf7fc;
+}
+
+/* ================= FEEDBACK ================= */
+textarea {
+  width:100%;
+  padding:14px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  resize:none;
+}
+
+.submit-btn {
+  margin-top:16px;
+  padding:12px 26px;
+  border:none;
+  border-radius:10px;
+  background:var(--accent);
+  color:white;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.submit-btn:hover {
+  background:var(--accent-dark);
+}
+
+/* ================= SUPPORT & COMPLAINTS ================= */
+.support-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-bottom: 36px;
+}
+
+.support-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+}
+
+.support-card h4 {
+  margin: 0 0 10px;
+  color: var(--accent);
+  font-size: 1.05rem;
+}
+
+.support-card p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0 0 18px;
+}
+
+.support-card .action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 22px;
+  border: none;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.support-card .action-btn:hover {
+  background: var(--accent-dark);
+  transform: translateY(-1px);
+}
+
+.support-card .action-btn.secondary {
+  background: #fff;
+  color: var(--accent);
+  border: 1px solid var(--border);
+  margin-left: 10px;
+}
+
+.support-card .action-btn.secondary:hover {
+  background: #faf7fc;
+}
+
+.support-card .btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.support-card .btn-row .action-btn {
+  margin-left: 0;
+}
+
+/* ================= FOOTER ================= */
+footer {
+  text-align:center;
+  padding:18px;
+  background:var(--accent);
+  color:white;
+  font-size:14px;
+}
+
+/* ================= LOGOUT MODAL ================= */
+#logoutModal {
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.45);
+  align-items:center;
+  justify-content:center;
+}
+
+#logoutModal .card {
+  width:360px;
+  text-align:center;
+}
+
+.modal-actions {
+  display:flex;
+  gap:12px;
+  justify-content:center;
+  margin-top:20px;
+}
+
+.cancel {
+  background:#e5e7eb;
+  border:none;
+  padding:10px 18px;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+.confirm {
+  background:var(--accent);
+  color:white;
+  border:none;
+  padding:10px 18px;
+  border-radius:8px;
+}
+
+.auth-banner {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  flex-wrap:wrap;
+  padding:16px 20px;
+  border-radius:14px;
+  margin-bottom:24px;
+  border:1px solid var(--border);
+  background:#fff;
+  box-shadow:0 8px 20px var(--shadow);
+}
+
+.auth-banner.warning {
+  border-color:#f59e0b;
+  background:linear-gradient(135deg, #fffbeb, #fff);
+}
+
+.auth-banner.guest {
+  border-color:#c4b5fd;
+  background:linear-gradient(135deg, #f5f3ff, #fff);
+}
+
+.auth-banner strong { color:var(--accent); display:block; margin-bottom:4px; }
+.auth-banner p { color:var(--muted); font-size:14px; margin:0; max-width:640px; }
+
+.auth-banner .auth-actions {
+  display:flex;
+  gap:10px;
+  flex-shrink:0;
+}
+
+.auth-banner .auth-actions a {
+  padding:10px 18px;
+  border-radius:10px;
+  font-weight:600;
+  text-decoration:none;
+  font-size:14px;
+}
+
+.auth-banner .btn-login {
+  background:var(--accent);
+  color:white;
+}
+
+.auth-banner .btn-dismiss {
+  background:#f3f4f6;
+  color:var(--text);
+  border:none;
+  cursor:pointer;
+  padding:10px 16px;
+  border-radius:10px;
+  font-weight:600;
+}
+
+.sidebar a.locked {
+  opacity:0.55;
+  position:relative;
+}
+
+.sidebar a.locked::after {
+  content:"🔒";
+  font-size:12px;
+  margin-left:auto;
+}
+
+/* Welcome banner */
+.welcome-banner {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  flex-wrap:wrap;
+  padding:22px 28px;
+  margin-bottom:24px;
+  border-radius:18px;
+  background:linear-gradient(135deg, #ffffff 0%, #f3eef6 55%, #ebe3f0 100%);
+  border:2px solid rgba(94,60,102,0.25);
+  box-shadow:0 12px 32px rgba(94,60,102,0.12);
+}
+
+.welcome-banner .welcome-text {
+  flex:1;
+  min-width:220px;
+}
+
+#userGreeting {
+  font-size:clamp(1.5rem, 3vw, 2rem);
+  font-weight:800;
+  letter-spacing:-0.02em;
+  margin:0 0 6px;
+  background:linear-gradient(135deg, var(--accent) 0%, #7b4c87 100%);
+  -webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+.welcome-sub {
+  color:var(--muted);
+  font-size:14px;
+  margin:0;
+  line-height:1.5;
+}
+
+.welcome-badge {
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 16px;
+  border-radius:999px;
+  background:var(--accent);
+  color:#fff;
+  font-size:13px;
+  font-weight:700;
+  white-space:nowrap;
+}
+
+.welcome-badge .dot {
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#4ade80;
+  animation:pulse-dot 1.8s ease infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity:1; transform:scale(1); }
+  50% { opacity:0.6; transform:scale(0.85); }
+}
+
+/* Hero section */
+.hero {
+  background:linear-gradient(135deg, var(--accent, #5e3c66), var(--accent-dark, #4a2f52));
+  color:white;
+  padding:32px 36px;
+  border-radius:18px;
+  margin-bottom:30px;
+}
+
+.hero h2 {
+  font-size:clamp(1.35rem, 2.5vw, 1.75rem);
+  margin-bottom:10px;
+}
+
+.hero p {
+  opacity:0.92;
+  line-height:1.65;
+  font-size:15px;
+  max-width:720px;
+}
+
+/* Process pipeline */
+.section-title {
+  font-size:1.35rem;
+  color:var(--accent);
+  margin:0 0 8px;
+}
+
+.section-lead {
+  color:var(--muted);
+  font-size:14px;
+  margin:0 0 22px;
+  max-width:680px;
+  line-height:1.6;
+}
+
+.process-section {
+  margin-bottom:40px;
+}
+
+.process-steps {
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
+  gap:20px;
+}
+
+.process-step {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:22px 20px;
+  text-align:center;
+  box-shadow:0 8px 24px var(--shadow);
+  opacity:0;
+  transform:translateY(18px);
+  animation:stepFadeIn 0.55s ease forwards;
+}
+
+.process-step:nth-child(1) { animation-delay:0.05s; }
+.process-step:nth-child(2) { animation-delay:0.15s; }
+.process-step:nth-child(3) { animation-delay:0.25s; }
+.process-step:nth-child(4) { animation-delay:0.35s; }
+
+@keyframes stepFadeIn {
+  to { opacity:1; transform:translateY(0); }
+}
+
+.process-icon {
+  width:52px;
+  height:52px;
+  margin:0 auto 14px;
+  border-radius:14px;
+  background:linear-gradient(135deg, #f3eef6, #e8dff0);
+  display:grid;
+  place-items:center;
+  font-size:24px;
+}
+
+.process-step h4 {
+  color:var(--accent);
+  margin:0 0 8px;
+  font-size:1rem;
+}
+
+.process-step p {
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.55;
+  margin:0;
+}
+
+.process-arrow {
+  display:none;
+}
+
+/* About & references */
+.about-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));
+  gap:22px;
+  margin-bottom:36px;
+}
+
+.about-card {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:24px;
+  box-shadow:0 8px 24px var(--shadow);
+}
+
+.about-card h4 {
+  color:var(--accent);
+  margin:0 0 10px;
+}
+
+.about-card p, .about-card li {
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.65;
+}
+
+.about-card ul {
+  margin:10px 0 0;
+  padding-left:18px;
+}
+
+.about-card a {
+  color:var(--accent);
+  font-weight:600;
+}
+
+.faq-item {
+  border-bottom:1px solid var(--border);
+  padding:14px 0;
+}
+
+.faq-item:last-child { border-bottom:none; }
+
+.faq-item strong {
+  display:block;
+  color:var(--text);
+  margin-bottom:6px;
+  font-size:14px;
+}
+
+.faq-item p {
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.55;
+  margin:0;
+}
+
+.cta-row {
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  margin-top:18px;
+}
+
+.cta-btn {
+  display:inline-flex;
+  align-items:center;
+  padding:11px 20px;
+  border-radius:10px;
+  background:var(--accent);
+  color:#fff;
+  font-weight:600;
+  font-size:14px;
+  text-decoration:none;
+  border:none;
+  cursor:pointer;
+  transition:background 0.2s, transform 0.2s;
+}
+
+.cta-btn:hover {
+  background:var(--accent-dark);
+  transform:translateY(-1px);
+}
+
+.cta-btn.outline {
+  background:#fff;
+  color:var(--accent);
+  border:1px solid var(--border);
+}
+
+footer.layout-footer {
+  margin-left:0;
+  transition:margin-left 0.3s;
+}
+
+footer.layout-footer.shift {
+  margin-left:240px;
+}
+
+@media (max-width:768px) {
+  .content.shift { margin-left:0; }
+  footer.layout-footer.shift { margin-left:0; }
+}
+</style>
+</head>
+
+<body class="page-dashboard">
+
+<!-- NAVBAR -->
+<div class="navbar">
+  <div class="logo">
+  <span id="sidebarToggle">&#9776;</span>
+  <img src="{{ url_for('static', filename='final logo.png') }}" alt="Mask Off Logo" class="logo-img">
+  <span class="logo-text">Mask Off</span>
+</div>
+  <div class="navbar-right">
+    <a href="/" class="maskoff-nav-btn maskoff-nav-home">Home</a>
+    <button id="logoutBtn" class="maskoff-nav-btn maskoff-nav-logout" style="display:none;" type="button">Logout</button>
+    <a id="loginBtn" href="/login" class="maskoff-nav-btn maskoff-nav-home" style="display:none;">Login</a>
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+ <div class="sidebar" id="sidebar">
+    <a class="active" href="/"> Dashboard</a>
+    <a href="/video-detection">Video Detection</a>
+    <a href="/image-detection">Image Detection</a>
+    <a href="/history">History</a>
+    <a href="/reports">Reports</a>
+    <a href="/settings">Settings</a>
+    <a href="/complaints">Complaints</a>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content" id="mainContent">
+
+    {% if need_login %}
+    <div class="auth-banner warning" id="loginRequiredBanner">
+      <div>
+        <strong>Login required</strong>
+        <p>Sign in to access detection tools, history, reports, and settings.</p>
+      </div>
+      <div class="auth-actions">
+        <a class="btn-login" href="/login{% if next_page %}?next={{ next_page }}{% endif %}">Log in now</a>
+        <button type="button" class="btn-dismiss" onclick="this.closest('.auth-banner').remove()">Dismiss</button>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="auth-banner guest" id="guestBanner" style="display:none;">
+      <div>
+        <strong>You're browsing as a guest</strong>
+        <p>Explore the dashboard overview below. Log in to run image/video detection and save your history.</p>
+      </div>
+      <div class="auth-actions">
+        <a class="btn-login" href="/login">Log in</a>
+        <a class="btn-login" href="/signup" style="background:#7a5b82;">Sign up</a>
+      </div>
+    </div>
+
+    <div class="auth-banner warning" id="featureBlockBanner" style="display:none;">
+      <div>
+        <strong id="featureBlockTitle">Login required</strong>
+        <p id="featureBlockText">Please log in to use this feature.</p>
+      </div>
+      <div class="auth-actions">
+        <a class="btn-login" href="/login" id="featureBlockLogin">Log in</a>
+        <button type="button" class="btn-dismiss" onclick="document.getElementById('featureBlockBanner').style.display='none'">Dismiss</button>
+      </div>
+    </div>
+
+    <!-- WELCOME -->
+    <div class="welcome-banner">
+      <div class="welcome-text">
+        <h1 id="userGreeting">Welcome</h1>
+        <p class="welcome-sub">Mask Off helps you verify whether images and videos are authentic or AI-manipulated — protecting trust in digital media.</p>
+      </div>
+      <div class="welcome-badge"><span class="dot"></span> System Operational</div>
+    </div>
+
+    <!-- HERO -->
+    <div class="hero">
+      <h2>Why Mask Off?</h2>
+      <p>
+        Deepfakes and synthetic media are spreading across social platforms, news, and messaging apps.
+        Mask Off uses trained neural networks to scan uploads,
+        sample video frames with MViTv2, and deliver clear Real vs. Manipulated verdicts — so individuals,
+        journalists, and investigators can make informed decisions quickly.
+      </p>
+      <div class="cta-row">
+        <a href="/video-detection" class="cta-btn" id="ctaVideo">Analyze Video</a>
+        <a href="/image-detection" class="cta-btn outline" id="ctaImage">Analyze Image</a>
+      </div>
+    </div>
+
+    <!-- HOW IT WORKS -->
+    <section class="process-section">
+      <h3 class="section-title">How Detection Works</h3>
+      <p class="section-lead">Every analysis follows the same transparent pipeline — from upload to final verdict.</p>
+      <div class="process-steps">
+        <div class="process-step">
+          <div class="process-icon">📤</div>
+          <h4>1. Upload or Capture</h4>
+          <p>Upload a suspicious image or video (MP4, AVI, MOV, WebM). Max 50MB, 1 minute for videos.</p>
+        </div>
+        <div class="process-step">
+          <div class="process-icon">🎞️</div>
+          <h4>2. Frame Extraction</h4>
+          <p>Videos are sampled at ~1 frame per second. Full frames are analyzed — no face required.</p>
+        </div>
+        <div class="process-step">
+          <div class="process-icon">🧠</div>
+          <h4>3. AI Analysis</h4>
+          <p>Video frames use MViTv2; images use EfficientNet — each scored Real or Manipulated with confidence %.</p>
+        </div>
+        <div class="process-step">
+          <div class="process-icon">📊</div>
+          <h4>4. Results &amp; Reports</h4>
+          <p>Majority voting decides the final verdict. Save history, download PDF reports with thumbnails.</p>
+        </div>
+      </div>
+    </section>
+    <!-- STATS -->
+    <h3 class="section-title">Your Activity Overview</h3>
+    <p class="section-lead">Live statistics from your detection history and platform performance.</p>
+    <div class="cards">
+      <div class="card"><h4>Total Videos Processed</h4><strong id="videosCount">—</strong></div>
+      <div class="card"><h4>Total Images Processed</h4><strong id="imagesCount">—</strong></div>
+      <div class="card"><h4>Average Accuracy</h4><strong id="avgAccuracy">—</strong></div>
+      <div class="card"><h4>System Status</h4><strong style="color:green;">Operational</strong></div>
+    </div>
+
+    <!-- ABOUT & REFERENCES -->
+    <section class="process-section">
+      <h3 class="section-title">Learn More</h3>
+      <p class="section-lead">Understanding deepfakes and why verification matters.</p>
+      <div class="about-grid">
+        <div class="about-card">
+          <h4>What are Deepfakes?</h4>
+          <p>Deepfakes use AI to swap faces, alter expressions, or generate entirely synthetic video. They can spread misinformation, impersonate public figures, and enable fraud.</p>
+          <ul>
+            <li>Face-swap manipulation in political videos</li>
+            <li>AI-generated profile photos on social media</li>
+            <li>Synthetic voice + video scams</li>
+          </ul>
+        </div>
+        <div class="about-card">
+          <h4>Who Uses Mask Off?</h4>
+          <p>Journalists verifying sources, cybercrime investigators, social media moderators, and anyone who needs a quick authenticity check before sharing media.</p>
+        </div>
+        <div class="about-card">
+          <h4>References &amp; Further Reading</h4>
+          <ul>
+            <li><a href="https://www.nccia.gov.pk/" target="_blank" rel="noopener">NCCIA — National Cyber Crime Investigation Agency</a></li>
+            <li><a href="https://ai.googleblog.com/2019/09/contributing-data-to-deepfake-detection.html" target="_blank" rel="noopener">Google Deepfake Detection Initiative</a></li>
+            <li><a href="https://arxiv.org/abs/2004.14402" target="_blank" rel="noopener">EfficientNet for Visual Recognition (Research)</a></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <div class="card" style="margin-bottom:36px;">
+      <h3 class="section-title" style="margin-bottom:16px;">Frequently Asked Questions</h3>
+      <div class="faq-item">
+        <strong>How accurate is video detection?</strong>
+        <p>We sample ~1 frame/sec and classify full frames with MViTv2, then combine scores with majority voting. Works on any video — faces not required.</p>
+      </div>
+      <div class="faq-item">
+        <strong>Can real videos be flagged as fake?</strong>
+        <p>Our model uses a balanced threshold and majority voting to reduce false positives. Low-quality or heavily compressed footage may affect results — always review per-frame details.</p>
+      </div>
+      <div class="faq-item">
+        <strong>What file formats are supported?</strong>
+        <p>Images: JPG, PNG. Videos: MP4, AVI, MOV, WebM — max 50MB and 1 minute duration.</p>
+      </div>
+      <div class="faq-item">
+        <strong>Are my uploads stored?</strong>
+        <p>Detection results and thumbnails are saved to your account history when logged in. Original files are processed in memory and not permanently stored on the server.</p>
+      </div>
+    </div>
+
+    <!-- PREVIEWS -->
+    <h3 class="section-title">Detection in Action</h3>
+    <p class="section-lead">See how image and video analysis works on sample media.</p>
+    <div class="preview-grid">
+      <div class="preview card">
+        <img src="{{ url_for('static', filename='image detection.png') }}" alt="Image deepfake detection example">
+        <h4>Image Detection</h4>
+        <p style="color:var(--muted); font-size:14px;">
+          Upload portraits or photos — our CNN model classifies authenticity in seconds.
+        </p>
+      </div>
+
+      <div class="preview card">
+        <video muted autoplay loop playsinline>
+          <source src="{{ url_for('static', filename='Trump_and_Navalny_1080p.mp4') }}" type="video/mp4">
+        </video>
+        <h4>Video Analysis</h4>
+        <p style="color:var(--muted); font-size:14px;">
+          Frame-by-frame deepfake scanning with face detection and majority-vote verdicts.
+        </p>
+      </div>
+    </div>
+
+    <!-- SUPPORT & COMPLAINTS -->
+    <div class="support-grid">
+      <div class="support-card">
+        <h4>Complaint Portal</h4>
+        <p>Report technical issues, incorrect detection results, or platform-related concerns through our formal complaint form.</p>
+        <button type="button" class="action-btn" onclick="window.location.href='/complaints'">
+          Submit Complaint
+        </button>
+      </div>
+      <div class="support-card">
+        <h4>Support &amp; Escalation</h4>
+        <p>Contact the <strong>National Cyber Crime Investigation Agency (NCCIA)</strong> helpdesk for urgent issues, feedback, or official escalation.</p>
+        <div class="btn-row">
+          <a class="action-btn"
+             href="mailto:helpdesk@nccia.gov.pk?subject=Mask%20Off%20Support%20Request">
+            Email NCCIA Helpdesk
+          </a>
+          <a class="action-btn secondary"
+             href="https://www.nccia.gov.pk/"
+             target="_blank"
+             rel="noopener noreferrer">
+            Visit NCCIA Portal
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="card">
+      <h3>Recent Detection Activity</h3>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr><th>Type</th><th>File</th><th>Result</th><th>Confidence</th><th>Date</th></tr>
+          </thead>
+          <tbody id="recentDetectionsTableBody">
+            <tr><td colspan="5" style="text-align:center;color:var(--muted);">Loading detections...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CHATBOT WIDGET -->
+    <div class="card" style="margin-top:32px;">
+      <h3>💬 Chatbot Assistant</h3>
+      
+      <div id="chatbox" style="
+        border:1px solid var(--border);
+        border-radius:12px;
+        background:#fafafa;
+        height:350px;
+        overflow-y:auto;
+        padding:16px;
+        margin-bottom:16px;
+        display:flex;
+        flex-direction:column;
+      ">
+        <!-- Chat messages will be inserted here -->
+        <div data-chat-welcome style="flex:1; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:14px;"></div>
+      </div>
+      
+      <div style="display:flex; gap:10px;">
+        <input 
+          id="chatInput" 
+          type="text" 
+          placeholder="Type your question here..." 
+          style="
+            flex:1;
+            padding:12px;
+            border:1px solid var(--border);
+            border-radius:10px;
+            font-size:14px;
+          "
+        />
+        <button id="sendBtn" class="submit-btn" style="margin-top:0; padding:12px 20px;">Send</button>
+      </div>
+      
+      <div id="statusMsg" style="margin-top:12px; font-size:13px; color:var(--muted); display:none;"></div>
+    </div>
+
+  </div>
+</div>
+
+<footer class="layout-footer" id="layoutFooter">
+  © 2026 Mask Off · AI-Powered Deepfake Detection System
+</footer>
+
+<!-- LOGOUT MODAL -->
+<div id="logoutModal">
+  <div class="card">
+    <h3>Confirm Logout</h3>
+    <p style="color:var(--muted); margin-top:8px;">Are you sure you want to log out?</p>
+    <div class="modal-actions">
+      <button class="cancel" id="cancelLogout">Cancel</button>
+      <button class="confirm" id="confirmLogout">Logout</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const PROTECTED_LINKS = [
+  { href: '/video-detection', label: 'Video Detection' },
+  { href: '/image-detection', label: 'Image Detection' },
+  { href: '/history', label: 'History' },
+  { href: '/reports', label: 'Reports' },
+  { href: '/settings', label: 'Settings' },
+  { href: '/complaints', label: 'Complaints' },
+];
+
+function showFeatureBlock(featureName, targetHref) {
+  const banner = document.getElementById('featureBlockBanner');
+  document.getElementById('featureBlockTitle').textContent = 'Login required';
+  document.getElementById('featureBlockText').textContent =
+    `You need to log in before opening ${featureName}.`;
+  const loginLink = document.getElementById('featureBlockLogin');
+  loginLink.href = targetHref ? `/login?next=${encodeURIComponent(targetHref)}` : '/login';
+  banner.style.display = 'flex';
+  banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+async function checkSession() {
+  try {
+    const response = await fetch('/api/check-session', { credentials: 'same-origin' });
+    const data = await response.json();
+
+    const logoutBtn = document.getElementById('logoutBtn');
+    const loginBtn = document.getElementById('loginBtn');
+    const userGreeting = document.getElementById('userGreeting');
+    const guestBanner = document.getElementById('guestBanner');
+    const sidebarLinks = document.querySelectorAll(
+      '.sidebar a[href*="/video-detection"], .sidebar a[href*="/image-detection"], ' +
+      '.sidebar a[href*="/history"], .sidebar a[href*="/reports"], .sidebar a[href*="/settings"], .sidebar a[href*="/complaints"]'
+    );
+
+    if (data.logged_in) {
+      let displayName = '';
+      let displayEmail = '';
+      try {
+        displayName = localStorage.getItem('maskoff-username') || '';
+        displayEmail = localStorage.getItem('maskoff-email') || '';
+      } catch (_) {}
+
+      if (!displayName && data.name) {
+        displayName = data.name;
+        try { localStorage.setItem('maskoff-username', data.name); } catch (_) {}
+      }
+      if (!displayEmail && data.email) {
+        displayEmail = data.email;
+        try { localStorage.setItem('maskoff-email', data.email); } catch (_) {}
+      }
+
+      userGreeting.textContent = `Welcome, ${displayName || displayEmail || 'User'} 👋`;
+      logoutBtn.style.display = 'block';
+      loginBtn.style.display = 'none';
+      if (guestBanner) guestBanner.style.display = 'none';
+
+      sidebarLinks.forEach((link) => {
+        link.classList.remove('locked');
+        link.onclick = null;
+        link.style.opacity = '';
+        link.style.cursor = '';
+      });
+    } else {
+      userGreeting.textContent = 'Welcome, Guest 👋';
+      logoutBtn.style.display = 'none';
+      loginBtn.style.display = 'block';
+      if (guestBanner) guestBanner.style.display = 'flex';
+
+      sidebarLinks.forEach((link) => {
+        const match = PROTECTED_LINKS.find((p) => link.getAttribute('href') === p.href);
+        const label = match ? match.label : 'this page';
+        link.classList.add('locked');
+        link.style.cursor = 'not-allowed';
+        link.onclick = (e) => {
+          e.preventDefault();
+          showFeatureBlock(label, link.getAttribute('href'));
+        };
+      });
+    }
+  } catch (error) {
+    console.log('Could not check session:', error);
+  }
+}
+
+// Run session check when page loads
+document.addEventListener('DOMContentLoaded', checkSession);
+
+window.addEventListener('maskoff:account-updated', (e) => {
+  const userGreeting = document.getElementById('userGreeting');
+  if (!userGreeting || !e.detail) return;
+  const name = e.detail.name || localStorage.getItem('maskoff-username');
+  const email = e.detail.email || localStorage.getItem('maskoff-email');
+  if (name || email) {
+    userGreeting.textContent = `Welcome, ${name || email}`;
+  }
+});
+
+// Sidebar toggle
+const sidebarToggle = document.getElementById("sidebarToggle");
+const sidebar = document.getElementById("sidebar");
+const content = document.getElementById("mainContent");
+
+sidebarToggle.onclick = (e) => {
+  e.stopPropagation();
+  sidebar.classList.toggle("show");
+  content.classList.toggle("shift");
+  const footer = document.getElementById("layoutFooter");
+  if (footer) footer.classList.toggle("shift");
+};
+
+// Logout modal
+const logoutBtn = document.getElementById("logoutBtn");
+const logoutModal = document.getElementById("logoutModal");
+const cancelLogout = document.getElementById("cancelLogout");
+const confirmLogout = document.getElementById("confirmLogout");
+
+logoutBtn.onclick = () => logoutModal.style.display = "flex";
+cancelLogout.onclick = () => logoutModal.style.display = "none";
+confirmLogout.onclick = () => {
+  if (window.MaskOff) MaskOff.clearSessionStorageOnly();
+  window.location.href = '/logout';
+};
+
+// ================= CHATBOT FUNCTIONALITY =================
+const CHATBOT_FALLBACK = "http://127.0.0.1:8000";
+let CHATBOT_API = "/api/chatbot";
+const chatbox = document.getElementById("chatbox");
+const chatInput = document.getElementById("chatInput");
+const sendBtn = document.getElementById("sendBtn");
+const statusMsg = document.getElementById("statusMsg");
+let chatbotReady = false;
+
+function clearChatWelcome() {
+  const welcome = chatbox.querySelector("[data-chat-welcome]");
+  if (welcome) welcome.remove();
+}
+
+function addMessage(text, sender) {
+  clearChatWelcome();
+  const msgDiv = document.createElement("div");
+  msgDiv.style.cssText = `
+    margin-bottom: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    max-width: 80%;
+    word-wrap: break-word;
+    font-size: 14px;
+  `;
+  
+  if (sender === "user") {
+    msgDiv.style.cssText += `
+      align-self: flex-end;
+      background: var(--accent);
+      color: white;
+      margin-left: auto;
+    `;
+  } else {
+    msgDiv.style.cssText += `
+      align-self: flex-start;
+      background: #e5e7eb;
+      color: var(--text);
+    `;
+  }
+  
+  msgDiv.textContent = text;
+  chatbox.appendChild(msgDiv);
+  chatbox.scrollTop = chatbox.scrollHeight;
+}
+
+function addLoadingIndicator() {
+  const loadingDiv = document.createElement("div");
+  loadingDiv.id = "loadingIndicator";
+  loadingDiv.style.cssText = `
+    margin-bottom: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #e5e7eb;
+    color: var(--text);
+    font-size: 14px;
+  `;
+  loadingDiv.innerHTML = "🤖 Typing<span class='dots'>.</span>";
+  chatbox.appendChild(loadingDiv);
+  chatbox.scrollTop = chatbox.scrollHeight;
+  
+  // Animate dots
+  let dots = 0;
+  const dotsInterval = setInterval(() => {
+    dots = (dots + 1) % 4;
+    const dotsSpan = loadingDiv.querySelector(".dots");
+    dotsSpan.textContent = ".".repeat(dots);
+    if (!document.getElementById("loadingIndicator")) clearInterval(dotsInterval);
+  }, 400);
+}
+
+function removeLoadingIndicator() {
+  const loading = document.getElementById("loadingIndicator");
+  if (loading) loading.remove();
+}
+
+async function resolveChatbotApi() {
+  try {
+    const res = await fetch("/api/chatbot/health", { credentials: "same-origin" });
+    if (res.ok) {
+      CHATBOT_API = "/api/chatbot";
+      return true;
+    }
+  } catch (_) { /* try fallback */ }
+  try {
+    const res = await fetch(`${CHATBOT_FALLBACK}/health`);
+    if (res.ok) {
+      CHATBOT_API = CHATBOT_FALLBACK;
+      return true;
+    }
+  } catch (_) {}
+  return false;
+}
+
+async function checkChatbotHealth() {
+  chatbotReady = await resolveChatbotApi();
+  if (chatbotReady) {
+    statusMsg.style.display = "none";
+    statusMsg.textContent = "Chatbot connected";
+    statusMsg.style.color = "#15803d";
+  } else {
+    statusMsg.style.display = "block";
+    statusMsg.textContent =
+      "Chatbot offline — run the Flask app (python app.py) or start chatbot_api on port 8000.";
+    statusMsg.style.color = "#b91c1c";
+  }
+}
+
+async function sendMessage() {
+  const message = chatInput.value.trim();
+  if (!message) return;
+
+  // Check for clear chat command
+  const lc = message.toLowerCase();
+  if (lc === "clear chat" || lc === "clear" || lc === "clear this chat") {
+    chatInput.value = "";
+    chatbox.innerHTML = '';
+    const welcomeDiv = document.createElement("div");
+    welcomeDiv.setAttribute("data-chat-welcome", "");
+    welcomeDiv.style.cssText = `flex:1; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:14px;`;
+    welcomeDiv.innerHTML = "<p>Chat cleared! 🧹 Start asking new questions about deepfake detection, the Mask Off system, and our platform.</p>";
+    chatbox.appendChild(welcomeDiv);
+    chatbox.scrollTop = chatbox.scrollHeight;
+    statusMsg.textContent = "Chat cleared";
+    statusMsg.style.color = "#7a5c83";
+    return;
+  }
+
+  chatInput.value = "";
+  addMessage(message, "user");
+  addLoadingIndicator();
+  sendBtn.disabled = true;
+
+  try {
+    // Include a short site context so the chatbot has basic knowledge of this webapp
+    const siteContext = {
+      app: 'Mask Off',
+      pages: ['Dashboard','Video Detection','Image Detection','History','Reports','Settings','Admin'],
+      note: 'This site provides image and video detection for manipulated media, reporting, and user history.'
+    };
+
+    const response = await fetch(`${CHATBOT_API}/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message, context: siteContext }),
+    });
+
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const data = await response.json();
+    removeLoadingIndicator();
+    const replyText = data.confidence != null
+      ? `${data.reply}\n\n(Confidence: ${(data.confidence * 100).toFixed(1)}%)`
+      : data.reply;
+    addMessage(replyText, "bot");
+    statusMsg.textContent = "Chatbot connected";
+    statusMsg.style.color = "#15803d";
+    chatbotReady = true;
+  } catch (error) {
+    removeLoadingIndicator();
+    console.error("Chatbot error:", error);
+    statusMsg.textContent =
+      "Could not reach chatbot API on port 8000. Start it from the chatbot_api folder.";
+    statusMsg.style.color = "#b91c1c";
+    addMessage(
+      "Cannot reach the chatbot right now. In chatbot_api run: python main.py",
+      "bot"
+    );
+  } finally {
+    sendBtn.disabled = false;
+    chatInput.focus();
+  }
+}
+
+sendBtn.onclick = sendMessage;
+chatInput.onkeypress = (e) => {
+  if (e.key === "Enter") sendMessage();
+};
+
+// ================= DASHBOARD STATS =================
+async function loadDashboardStats() {
+  try {
+    const res = await fetch("/api/dashboard-stats");
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    
+    const data = await res.json();
+    
+    // Update stats
+    document.getElementById('videosCount').textContent = data.videos_processed || 0;
+    document.getElementById('imagesCount').textContent = data.images_processed || 0;
+    document.getElementById('avgAccuracy').textContent = (data.average_accuracy || 0) + '%';
+    
+    // Update recent detections table
+    const tbody = document.getElementById('recentDetectionsTableBody');
+    tbody.innerHTML = '';
+    
+    if (data.recent_detections && data.recent_detections.length > 0) {
+      data.recent_detections.forEach((det) => {
+        const row = document.createElement('tr');
+        const uploadDate = det.uploaded_at ? new Date(det.uploaded_at) : null;
+        const dateStr = uploadDate ? uploadDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A';
+        
+        const resultClass = (det.verdict || '').toLowerCase().includes('manipulated') ? 'fake' : 'real';
+        const resultText = resultClass === 'fake' ? 'Likely Manipulated' : 'Likely Real';
+        
+        row.innerHTML = `
+          <td>${det.file_type === 'video' ? 'Video' : 'Image'}</td>
+          <td>${escapeHtml(det.filename)}</td>
+          <td><span style="color:${resultClass === 'fake' ? '#be185d' : '#0d9488'}; font-weight:600;">${resultText}</span></td>
+          <td>${(det.confidence || 0).toFixed(1)}%</td>
+          <td>${dateStr}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    } else {
+      const row = document.createElement('tr');
+      row.innerHTML = '<td colspan="5" style="text-align:center;color:var(--muted);">No detections yet</td>';
+      tbody.appendChild(row);
+    }
+  } catch (error) {
+    console.error('Error loading dashboard stats:', error);
+    document.getElementById('videosCount').textContent = '0';
+    document.getElementById('imagesCount').textContent = '0';
+    document.getElementById('avgAccuracy').textContent = '0%';
+  }
+}
+
+function escapeHtml(text) {
+  const d = document.createElement('div');
+  d.textContent = text == null ? '' : String(text);
+  return d.innerHTML;
+}
+
+checkChatbotHealth();
+loadDashboardStats();
+
+// Refresh dashboard stats every 30 seconds
+setInterval(loadDashboardStats, 30000);
+</script>
+
+</body>
+</html>

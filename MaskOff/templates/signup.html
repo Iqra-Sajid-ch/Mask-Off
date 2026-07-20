@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sign Up - Mask Off</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='maskoff-theme.css') }}">
+  <script src="{{ url_for('static', filename='theme.js') }}"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Roboto Slab', serif;
+      background-color: var(--bg, #b695b6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    header {
+      position: fixed; top: 0; width: 100%; background-color: var(--nav-bg, #5e3c65);
+      color: white; display: flex; justify-content: space-between;
+      align-items: center; padding: 10px 40px; z-index: 1000;
+    }
+    .brand { display: flex; align-items: center; gap: 14px; }
+    .brand img { height: 76px; }
+    .brand h1 { font-size: 32px; font-weight: 800; margin: 0; }
+    .home-link {
+      color: white; text-decoration: none; font-weight: bold; font-size: 14px;
+    }
+    .signup-card {
+      background-color: white; padding: 40px 30px; max-width: 460px; width: 100%;
+      margin-top: 100px; border-radius: 10px;
+      box-shadow: 0 0 25px rgba(0,0,0,0.1);
+    }
+    .signup-card h2 {
+      font-size: 28px; text-align: center; margin-bottom: 25px;
+    }
+    form {
+      display: flex; flex-direction: column;
+    }
+    .input-group {
+      position: relative; margin-bottom: 20px;
+    }
+    input[type="text"], input[type="email"], input[type="password"] {
+      width: 100%; padding: 12px; padding-right: 40px;
+      border: none; border-bottom: 2px solid #333;
+      background: transparent; font-size: 16px; color: #000;
+    }
+    .submit-btn {
+      background-color: #9b6ea0; color: white; border: none;
+      padding: 14px; font-size: 16px; cursor: pointer;
+      border-radius: 4px; margin-top: 10px;
+    }
+    .submit-btn:hover { background-color: #875a90; }
+    .bottom-text {
+      text-align: center; margin-top: 20px; font-size: 14px;
+    }
+    .bottom-text a {
+      color: darkred; text-decoration: none; font-weight: bold;
+    }
+    .error-msg {
+      background: #fef2f2; color: #b91c1c; padding: 12px 14px;
+      border-radius: 8px; font-size: 14px; margin-bottom: 18px; text-align: center;
+    }
+    @media (max-width: 768px) {
+      .signup-card { margin-top: 120px; padding: 30px 20px; }
+      header {
+        flex-direction: column; align-items: flex-start; padding: 10px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="brand">
+      <img src="{{ url_for('static', filename='final logo.png') }}" alt="Logo">
+      <h1>MASK OFF</h1>
+    </div>
+    <a href="/" class="home-link">Home</a>
+  </header>
+
+  <!-- SIGN UP FORM CARD -->
+  <div class="signup-card">
+    <h2>Create Account</h2>
+
+    {% if error == 'missing' %}
+    <div class="error-msg">Please fill in all fields.</div>
+    {% elif error == 'mismatch' %}
+    <div class="error-msg">Passwords do not match.</div>
+    {% elif error == 'exists' %}
+    <div class="error-msg">This email is already registered.</div>
+    {% elif error == 'server' %}
+    <div class="error-msg">Could not create account. Please try again.</div>
+    {% endif %}
+
+    <form method="POST" action="/api/signup">
+      <div class="input-group">
+        <input type="text" name="name" placeholder="Full Name" required>
+      </div>
+
+      <div class="input-group">
+        <input type="email" name="email" placeholder="Email Address" required>
+      </div>
+
+      <div class="input-group">
+        <input type="text" name="phone" placeholder="Phone Number (e.g. +923001234567)" required>
+      </div>
+
+      <div class="input-group">
+        <input type="password" name="password" id="password" placeholder="Password" required>
+      </div>
+
+      <div class="input-group">
+        <input type="password" name="password_confirmation" id="confirm_password" placeholder="Confirm Password" required>
+      </div>
+
+      <button type="submit" class="submit-btn">Sign Up</button>
+
+      <div class="bottom-text">
+        Already have an account? <a href="/login">Login</a>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    function togglePassword(id) {
+      const input = document.getElementById(id);
+      input.type = input.type === 'password' ? 'text' : 'password';
+    }
+  </script>
+</body>
+</html>

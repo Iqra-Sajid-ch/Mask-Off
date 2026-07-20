@@ -1,0 +1,10 @@
+MaskOff/model/
+MaskOff/app.py
+MaskOff/scripts/
+MaskOff/**/*.php
+MaskOff/static/*.mp4
+*.keras
+*.h5
+*.pth
+.env
+Mask Off Screen Recording/*.mp4

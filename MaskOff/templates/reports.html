@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reports | Mask Off</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='maskoff-theme.css') }}">
+<script src="{{ url_for('static', filename='theme.js') }}"></script>
+<style>
+:root {
+  --primary: #5e3c66;
+  --primary-dark: #5e3c66;
+  --primary-soft: #EDEBFF;
+  --bg: #F5F6FA;
+  --white: #FFFFFF;
+  --text: #1F2937;
+  --muted: #6B7280;
+  --border: #E5E7EB;
+  --shadow: rgba(0,0,0,0.08);
+  --radius: 14px;
+  --transition: all 0.3s ease;
+  --success: #8fd3c7;
+  --danger: #d291bc;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding-top: 88px;
+}
+
+.main-wrapper { flex: 1; }
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1100;
+  height: 88px;
+  background: var(--accent, #5e3c66);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 36px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+
+.logo-container { display: flex; align-items: center; gap: 14px; cursor: pointer; }
+.logo-img { height: 76px; width: auto; }
+.logo-text { font-size: 32px; font-weight: 800; color: var(--white); letter-spacing: 0.5px; }
+
+.navbar-right { display: flex; align-items: center; gap: 16px; }
+.navbar-right a {
+  color: var(--white);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 6px;
+}
+.navbar-right a:hover { background: rgba(255,255,255,0.15); }
+.navbar-right button {
+  background: transparent;
+  color: var(--white);
+  border: 1px solid rgba(255,255,255,0.6);
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.container { max-width: 1200px; margin: 40px auto; padding: 0 24px; }
+.header { margin-bottom: 32px; }
+.header h2 { font-size: 28px; margin-bottom: 6px; color: var(--primary-dark); }
+.header p { color: var(--muted); font-size: 15px; }
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+}
+
+.card {
+  background: var(--white);
+  padding: 24px;
+  border-radius: var(--radius);
+  box-shadow: 0 8px 24px var(--shadow);
+  transition: var(--transition);
+}
+
+.card:hover { transform: translateY(-4px); }
+.card h4 { color: var(--primary-dark); margin-bottom: 8px; }
+.card p { color: var(--muted); font-size: 14px; min-height: 40px; }
+
+.card button {
+  margin-top: 14px;
+  background: var(--primary);
+  color: var(--white);
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  width: 100%;
+}
+.card button:hover { background: #6f4b77; }
+.card button.secondary {
+  background: white;
+  color: var(--primary);
+  border: 1px solid var(--border);
+}
+
+.table-card { margin-top: 40px; }
+
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  margin-top: 16px;
+}
+
+.table-wrapper::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+  background: #f5f5f5;
+  border-radius: 10px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+  background: #d0d0d0;
+  border-radius: 10px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #b0b0b0;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 720px;
+}
+
+th, td {
+  padding: 14px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+th {
+  color: var(--muted);
+  font-weight: 600;
+  background: #f9f9f9;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+td {
+  font-size: 14px;
+}
+
+/* Column widths */
+th:nth-child(1), td:nth-child(1) { width: 35%; min-width: 200px; white-space: normal; word-break: break-word; }
+th:nth-child(2), td:nth-child(2) { width: 12%; min-width: 80px; }
+th:nth-child(3), td:nth-child(3) { width: 18%; min-width: 100px; }
+th:nth-child(4), td:nth-child(4) { width: 15%; min-width: 90px; text-align: center; }
+th:nth-child(5), td:nth-child(5) { width: 20%; min-width: 120px; }
+
+tr:hover {
+  background: #f0f8ff;
+}
+
+tr:hover td {
+  background-color: #f0f8ff;
+}
+
+footer {
+  padding: 22px;
+  text-align: center;
+  background: var(--primary-dark);
+  color: var(--white);
+  font-size: 14px;
+}
+
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(31, 41, 55, 0.5);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+
+.modal-panel {
+  background: white;
+  border-radius: var(--radius);
+  max-width: 520px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.modal-header {
+  background: linear-gradient(135deg, #6f4b77, #5e3c66);
+  color: white;
+  padding: 22px 24px;
+  border-radius: var(--radius) var(--radius) 0 0;
+  position: relative;
+}
+.modal-header h3 { font-size: 20px; }
+.modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.modal-body { padding: 24px; }
+
+.bar-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.bar-label { width: 140px; font-size: 13px; flex-shrink: 0; }
+.bar-track {
+  flex: 1;
+  height: 22px;
+  background: #f3f4f6;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #5e3c66, #7a5b82);
+  border-radius: 10px;
+  min-width: 4px;
+  transition: width 0.4s ease;
+}
+.bar-fill.real { background: linear-gradient(90deg, #0d9488, #8fd3c7); }
+.bar-fill.fake { background: linear-gradient(90deg, #be185d, #d291bc); }
+.bar-value { width: 36px; text-align: right; font-size: 13px; font-weight: 600; }
+
+.stat-table { width: 100%; margin-top: 8px; }
+.stat-table td { padding: 10px 0; border-bottom: 1px solid var(--border); }
+.stat-table td:last-child { text-align: right; font-weight: 600; color: var(--primary); }
+
+#logoutModal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+}
+#logoutModal.open { display: flex; }
+#logoutModal .modal {
+  background: var(--white);
+  padding: 28px;
+  border-radius: var(--radius);
+  width: 360px;
+  text-align: center;
+}
+.modal-actions { display: flex; gap: 12px; justify-content: center; margin-top: 20px; }
+#cancelLogout { background: #E5E7EB; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; }
+#confirmLogout { background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; }
+</style>
+</head>
+
+<body>
+
+<div class="main-wrapper">
+  <div class="navbar">
+    <div class="logo-container" onclick="window.location.href='/'">
+      <img src="{{ url_for('static', filename='final logo.png') }}" alt="Mask Off Logo" class="logo-img">
+      <span class="logo-text">Mask Off</span>
+    </div>
+    <div class="navbar-right maskoff-navbar-right">
+      <a href="/" class="maskoff-nav-btn maskoff-nav-home">Home</a>
+      <button type="button" class="maskoff-nav-btn maskoff-nav-logout" id="logoutBtn">Logout</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <h2>Reports</h2>
+      <p>Analytics, performance summaries, and downloadable reports.</p>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <h4>Total Detections</h4>
+        <p id="totalDetections">—</p>
+        <button type="button" onclick="downloadFullReport()">Download Full PDF Report</button>
+      </div>
+
+      <div class="card">
+        <h4>Average Confidence</h4>
+        <p id="avgConfidence">—</p>
+        <button type="button" class="secondary" onclick="openTrendsModal()">View Trends</button>
+      </div>
+
+      <div class="card">
+        <h4>File Type Breakdown</h4>
+        <p id="fileTypeBreakdown">—</p>
+        <button type="button" class="secondary" onclick="openDetailsModal()">View Details</button>
+      </div>
+    </div>
+
+    <div class="card table-card">
+      <h3>Recent Detections</h3>
+      <div class="table-wrapper">
+        <table id="recentDetectionsTable">
+          <thead>
+            <tr>
+              <th>Filename</th>
+              <th>Type</th>
+              <th>Result</th>
+              <th>Confidence</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="recentDetectionsBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>© 2026 Mask Off · All rights reserved</footer>
+
+<!-- Analytics: verdict trends -->
+<div class="modal-overlay" id="trendsModal">
+  <div class="modal-panel">
+    <div class="modal-header">
+      <button type="button" class="modal-close" data-close="trendsModal">×</button>
+      <h3>Verdict Trends</h3>
+    </div>
+    <div class="modal-body" id="trendsModalBody">
+      <p style="color:var(--muted);">Loading…</p>
+    </div>
+  </div>
+</div>
+
+<!-- Analytics: breakdown details -->
+<div class="modal-overlay" id="detailsModal">
+  <div class="modal-panel">
+    <div class="modal-header">
+      <button type="button" class="modal-close" data-close="detailsModal">×</button>
+      <h3>Detection Breakdown</h3>
+    </div>
+    <div class="modal-body" id="detailsModalBody">
+      <p style="color:var(--muted);">Loading…</p>
+    </div>
+  </div>
+</div>
+
+<div id="logoutModal">
+  <div class="modal">
+    <h3>Confirm Logout</h3>
+    <p>Are you sure you want to log out?</p>
+    <div class="modal-actions">
+      <button type="button" id="cancelLogout">Cancel</button>
+      <button type="button" id="confirmLogout">Logout</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let reportStats = null;
+
+function escapeHtml(text) {
+  const d = document.createElement('div');
+  d.textContent = text == null ? '' : String(text);
+  return d.innerHTML;
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+
+document.querySelectorAll('.modal-close').forEach((btn) => {
+  btn.addEventListener('click', () => closeModal(btn.dataset.close));
+});
+
+document.querySelectorAll('.modal-overlay').forEach((overlay) => {
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+
+function renderBarChart(containerId, data, labelKey) {
+  const container = document.getElementById(containerId);
+  const entries = Object.entries(data || {});
+  if (!entries.length) {
+    container.innerHTML = '<p style="color:var(--muted);">No data yet. Run some detections first.</p>';
+    return;
+  }
+  const max = Math.max(...entries.map(([, v]) => v), 1);
+  container.innerHTML = entries.map(([label, count]) => {
+    const pct = Math.round((count / max) * 100);
+    const cls = label.toLowerCase().includes('real') ? 'real'
+      : label.toLowerCase().includes('manipulated') ? 'fake' : '';
+    return `
+      <div class="bar-row">
+        <span class="bar-label">${escapeHtml(label)}</span>
+        <div class="bar-track"><div class="bar-fill ${cls}" style="width:${pct}%"></div></div>
+        <span class="bar-value">${count}</span>
+      </div>
+    `;
+  }).join('');
+}
+
+function openTrendsModal() {
+  const body = document.getElementById('trendsModalBody');
+  if (!reportStats) {
+    body.innerHTML = '<p style="color:var(--muted);">No statistics loaded yet.</p>';
+  } else {
+    body.innerHTML = `
+      <p style="margin-bottom:16px;color:var(--muted);font-size:14px;">
+        How your detections split between real and manipulated content.
+      </p>
+      <div id="verdictBars"></div>
+      <p style="margin-top:16px;font-size:13px;color:var(--muted);">
+        Average confidence across all scans: <strong>${reportStats.average_confidence || 0}%</strong>
+      </p>
+    `;
+    renderBarChart('verdictBars', reportStats.verdict_breakdown || {});
+  }
+  openModal('trendsModal');
+}
+
+function openDetailsModal() {
+  const body = document.getElementById('detailsModalBody');
+  if (!reportStats) {
+    body.innerHTML = '<p style="color:var(--muted);">No statistics loaded yet.</p>';
+  } else {
+    const types = reportStats.file_type_breakdown || {};
+    const verdicts = reportStats.verdict_breakdown || {};
+    let typeRows = Object.entries(types).map(([k, v]) =>
+      `<tr><td>${escapeHtml(k.charAt(0).toUpperCase() + k.slice(1))}</td><td>${v}</td></tr>`
+    ).join('');
+    let verdictRows = Object.entries(verdicts).map(([k, v]) =>
+      `<tr><td>${escapeHtml(k)}</td><td>${v}</td></tr>`
+    ).join('');
+    if (!typeRows) typeRows = '<tr><td colspan="2">No data</td></tr>';
+    if (!verdictRows) verdictRows = '<tr><td colspan="2">No data</td></tr>';
+
+    body.innerHTML = `
+      <h4 style="color:var(--primary);margin-bottom:12px;">By file type</h4>
+      <table class="stat-table">${typeRows}</table>
+      <h4 style="color:var(--primary);margin:20px 0 12px;">By verdict</h4>
+      <table class="stat-table">${verdictRows}</table>
+      <p style="margin-top:16px;font-size:13px;color:var(--muted);">
+        Total scans: <strong>${reportStats.total_detections || 0}</strong>
+      </p>
+    `;
+  }
+  openModal('detailsModal');
+}
+
+async function loadReports() {
+  try {
+    const reportResponse = await fetch('/api/get-reports', { credentials: 'same-origin' });
+    if (reportResponse.ok) {
+      reportStats = await reportResponse.json();
+      document.getElementById('totalDetections').textContent =
+        reportStats.total_detections ?? 0;
+      document.getElementById('avgConfidence').textContent =
+        (reportStats.average_confidence || 0) + '%';
+
+      const fileTypes = reportStats.file_type_breakdown || {};
+      const parts = Object.entries(fileTypes).map(
+        ([type, count]) => `${type}: ${count}`
+      );
+      document.getElementById('fileTypeBreakdown').textContent =
+        parts.length ? parts.join(' · ') : 'No data yet';
+    }
+
+    const historyResponse = await fetch('/api/get-history', { credentials: 'same-origin' });
+    const tbody = document.getElementById('recentDetectionsBody');
+    tbody.innerHTML = '';
+
+    if (historyResponse.ok) {
+      const data = await historyResponse.json();
+      if (data.detections && data.detections.length > 0) {
+        data.detections.slice(0, 10).forEach((detection) => {
+          const row = document.createElement('tr');
+          const dateObj = new Date(detection.uploaded_at);
+          const formattedDate = dateObj.toLocaleDateString('en-US', {
+            year: 'numeric', month: 'short', day: 'numeric',
+          });
+          row.innerHTML = `
+            <td>${escapeHtml(detection.filename)}</td>
+            <td>${escapeHtml(detection.file_type)}</td>
+            <td>${escapeHtml(detection.verdict)}</td>
+            <td>${escapeHtml(detection.confidence)}%</td>
+            <td>${escapeHtml(formattedDate)}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      } else {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);">No detections yet</td></tr>';
+      }
+    }
+  } catch (error) {
+    console.error('Error loading reports:', error);
+  }
+}
+
+async function downloadFullReport() {
+  try {
+    const response = await fetch('/api/download-report', { credentials: 'same-origin' });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      alert(err.error || 'Error generating report');
+      return;
+    }
+    const contentType = response.headers.get('content-type') || '';
+    if (!contentType.includes('application/pdf')) {
+      const err = await response.json().catch(() => ({}));
+      alert(err.error || 'PDF could not be generated. Restart the Flask app and try again.');
+      return;
+    }
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `mask_off_full_report_${Date.now()}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  } catch (error) {
+    console.error('Error downloading report:', error);
+    alert('Failed to download report');
+  }
+}
+
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  document.getElementById('logoutModal').classList.add('open');
+});
+document.getElementById('cancelLogout').addEventListener('click', () => {
+  document.getElementById('logoutModal').classList.remove('open');
+});
+document.getElementById('confirmLogout').addEventListener('click', () => {
+  window.location.href = '/logout';
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadReports();
+  setInterval(loadReports, 30000);
+});
+</script>
+</body>
+</html>

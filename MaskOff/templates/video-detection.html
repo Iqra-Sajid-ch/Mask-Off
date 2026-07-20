@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Video Detection | Mask Off</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='maskoff-theme.css') }}">
+<script src="{{ url_for('static', filename='theme.js') }}"></script>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Inter, system-ui, sans-serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  padding-top: 88px;
+}
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1100;
+  height: 88px;
+  padding: 0 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--nav-bg, #5e3c66);
+  color: white;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.logo-img {
+  height: 76px;
+  width: auto;
+}
+
+.logo-text {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.nav-link {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.nav-link:hover {
+  text-decoration: underline;
+}
+
+.profile {
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.hero {
+  max-width: 1200px;
+  margin: 60px auto;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: center;
+}
+
+.hero h1 {
+  font-size: 44px;
+  line-height: 1.2;
+  margin-bottom: 16px;
+}
+
+.hero h1 span {
+  color: var(--accent);
+}
+
+.hero p {
+  color: var(--muted);
+  font-size: 18px;
+  margin-bottom: 24px;
+}
+
+.hero-video {
+  width: 100%;
+  max-width: 100%;
+  aspect-ratio: 16/9;
+  background: black;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.hero-video video {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.scanner {
+  max-width: 1000px;
+  margin: 80px auto;
+  padding: 0 24px;
+}
+
+.card {
+  background: var(--card);
+  border-radius: 18px;
+  padding: 32px;
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+}
+
+.upload-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  align-items: center;
+}
+
+.video-preview {
+  width: 100%;
+  aspect-ratio: 16/9;
+  border-radius: 14px;
+  border: 2px dashed var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fafafa;
+  overflow: hidden;
+}
+
+.video-preview video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.upload h3 {
+  margin-bottom: 8px;
+}
+
+.upload p {
+  color: var(--muted);
+}
+
+.upload button {
+  margin-top: 14px;
+  padding: 12px 24px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.upload .primary {
+  background: var(--accent);
+  color: white;
+}
+
+.upload .secondary {
+  background: white;
+  border: 1px solid var(--border);
+}
+
+.results {
+  margin-top: 32px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.results.frames-summary {
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 16px;
+}
+
+.frame-list {
+  margin-top: 24px;
+  max-height: 280px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  background: #fafafa;
+}
+
+.frame-list h4 {
+  margin-bottom: 12px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.frame-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+
+.frame-row:last-child { border-bottom: none; }
+
+.frame-row.real { color: #0d9488; }
+.frame-row.fake { color: #be185d; }
+
+.result {
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.result strong {
+  font-size: 22px;
+  color: var(--accent);
+}
+
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: 1fr;
+  }
+  .hero-video {
+    width: 100%;
+  }
+  .upload-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: white;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 4px 12px rgba(94, 60, 102, 0.2);
+}
+</style>
+</head>
+
+<body>
+
+<div class="navbar">
+  <div class="logo">
+    <img src="{{ url_for('static', filename='final logo.png') }}" alt="Mask Off Logo" class="logo-img">
+      <span class="logo-text">Mask Off</span>
+  </div>
+
+  <div class="nav-actions maskoff-navbar-right">
+    <a href="/" class="maskoff-nav-btn maskoff-nav-home">Home</a>
+    <button type="button" class="maskoff-nav-btn maskoff-nav-logout" onclick="logout()">Logout</button>
+  </div>
+</div>
+
+<section class="hero">
+  <div>
+    <h1>Scan & Detect <span>Deepfake Videos</span></h1>
+    <p>
+      Upload a suspicious video to determine whether it has been synthetically
+      manipulated using AI-generated content.
+    </p>
+  </div>
+
+  <div class="hero-video">
+    <video id="heroVideo" autoplay muted loop playsinline preload="auto">
+      <source src="{{ url_for('static', filename='Trump_and_Navalny_1080p.mp4') }}" type="video/mp4">
+    </video>
+  </div>
+</section>
+
+<section class="scanner">
+  <div class="card">
+    <div class="upload-layout">
+
+      <div class="video-preview" id="preview">
+        <span style="color:var(--muted)">No video selected</span>
+      </div>
+
+      <div class="upload">
+        <h3>Upload Video for Analysis</h3>
+        <p>MP4, AVI, MOV, WebM • Max 50MB • Max length 1 minute</p>
+        <p style="font-size:13px;color:var(--muted);margin-top:8px;line-height:1.5;">
+          Pipeline: ~1 frame/sec full-frame sampling → MViTv2 model →
+          per-frame Real/Fake score → majority vote with calibrated confidence.
+        </p>
+
+        <input type="file" id="videoInput" hidden accept="video/mp4,video/avi,video/quicktime,video/webm,video/*">
+
+        <button class="primary" onclick="videoInput.click()">Upload Video</button>
+        <button class="secondary" id="analyzeBtn" onclick="runDetection()" disabled>Analyze Video</button>
+      </div>
+
+    </div>
+
+    <div class="results">
+      <div class="result">
+        <span>Status</span><br>
+        <strong id="status">—</strong>
+      </div>
+      <div class="result">
+        <span>Confidence</span><br>
+        <strong id="confidence">—</strong>
+      </div>
+      <div class="result">
+        <span>Verdict</span><br>
+        <strong id="verdict">—</strong>
+      </div>
+    </div>
+
+    <div class="results frames-summary" id="frameSummary" style="display:none;">
+      <div class="result">
+        <span>Frames analyzed</span><br>
+        <strong id="totalFrames">—</strong>
+      </div>
+      <div class="result">
+        <span>Analysis mode</span><br>
+        <strong id="facesDetected">—</strong>
+      </div>
+      <div class="result">
+        <span>Real / Fake frames</span><br>
+        <strong id="realFakeFrames">—</strong>
+      </div>
+    </div>
+
+    <div class="results method-summary" id="methodSummary" style="display:none;">
+      <div class="result">
+        <span>Final (avg confidence)</span><br>
+        <strong id="avgVerdict">—</strong>
+      </div>
+      <div class="result">
+        <span>Majority vote</span><br>
+        <strong id="majorityVerdict">—</strong>
+      </div>
+      <div class="result">
+        <span>Avg fake probability</span><br>
+        <strong id="avgFakeProb">—</strong>
+      </div>
+    </div>
+
+    <div class="frame-list" id="frameList" style="display:none;">
+      <h4>Per-frame detection (evenly spaced samples)</h4>
+      <div id="frameRows"></div>
+    </div>
+  </div>
+</section>
+
+<script>
+const videoInput = document.getElementById("videoInput");
+const preview = document.getElementById("preview");
+const analyzeBtn = document.getElementById("analyzeBtn");
+
+// Force the hero video to autoplay as soon as the page loads
+(function () {
+  const heroVid = document.getElementById("heroVideo");
+  if (!heroVid) return;
+  heroVid.muted = true;
+  const tryPlay = () => heroVid.play().catch(() => {});
+  if (document.readyState === "complete" || document.readyState === "interactive") {
+    tryPlay();
+  } else {
+    document.addEventListener("DOMContentLoaded", tryPlay);
+  }
+  document.addEventListener("click", tryPlay, { once: true });
+})();
+
+
+videoInput.addEventListener("change", () => {
+  const file = videoInput.files[0];
+  if (!file) return;
+
+  const url = URL.createObjectURL(file);
+  preview.innerHTML = `<video src="${url}" controls></video>`;
+  analyzeBtn.disabled = false;
+  document.getElementById("status").innerText = "Ready";
+  document.getElementById("confidence").innerText = "—";
+  document.getElementById("verdict").innerText = "—";
+  document.getElementById("frameSummary").style.display = "none";
+  document.getElementById("methodSummary").style.display = "none";
+  document.getElementById("frameList").style.display = "none";
+});
+
+function runDetection() {
+  const file = videoInput.files[0];
+
+  if (!file) {
+    document.getElementById("status").innerText = "No video selected";
+    return;
+  }
+
+  document.getElementById("status").innerText = "Scanning frames...";
+  document.getElementById("confidence").innerText = "—";
+  document.getElementById("verdict").innerText = "—";
+  document.getElementById("frameSummary").style.display = "none";
+  document.getElementById("methodSummary").style.display = "none";
+  document.getElementById("frameList").style.display = "none";
+  analyzeBtn.disabled = true;
+
+  const formData = new FormData();
+  formData.append("video", file);
+
+  fetch("/api/detect-video", {
+    method: "POST",
+    body: formData,
+    credentials: "same-origin"
+  })
+  .then(response => response.json())
+  .then(data => {
+    analyzeBtn.disabled = false;
+    if (data.status === "Completed") {
+      document.getElementById("status").innerText = "Completed";
+      document.getElementById("confidence").innerText = data.confidence;
+      document.getElementById("verdict").innerText = data.verdict;
+
+      document.getElementById("totalFrames").innerText = data.total_frames;
+      document.getElementById("facesDetected").innerText =
+        data.pipeline ? "Full frame (MViTv2)" : "Full frame";
+      document.getElementById("realFakeFrames").innerText =
+        `${data.real_frames} / ${data.fake_frames}`;
+      document.getElementById("frameSummary").style.display = "grid";
+
+      document.getElementById("avgVerdict").innerText =
+        `${data.verdict} (${data.confidence})`;
+      document.getElementById("majorityVerdict").innerText =
+        data.majority_verdict
+          ? `${data.majority_verdict} (${data.majority_confidence}%)`
+          : "—";
+      document.getElementById("avgFakeProb").innerText =
+        data.avg_fake_probability != null
+          ? (data.avg_fake_probability * 100).toFixed(1) + "%"
+          : "—";
+      document.getElementById("methodSummary").style.display = "grid";
+
+      const rows = document.getElementById("frameRows");
+      rows.innerHTML = "";
+      (data.frame_results || []).forEach((frame) => {
+        const row = document.createElement("div");
+        const cls = frame.label === "real" ? "real" : "fake";
+        row.className = `frame-row ${cls}`;
+        const vf = frame.video_frame != null ? frame.video_frame : frame.frame;
+        const modeTag = frame.analysis_mode || "full frame";
+        row.innerHTML =
+          `<span>Sample #${frame.frame} (video frame ${vf}, ${modeTag})</span>` +
+          `<span>${frame.verdict} (${frame.confidence}%)</span>`;
+        rows.appendChild(row);
+      });
+      document.getElementById("frameList").style.display = "block";
+
+      if (window.MaskOff) {
+        MaskOff.notify(
+          "Video scan complete",
+          `${data.verdict} — ${data.real_frames} real / ${data.fake_frames} fake frames`
+        );
+      }
+    } else {
+      document.getElementById("status").innerText = "Error";
+      document.getElementById("confidence").innerText = "—";
+      document.getElementById("verdict").innerText = data.message || "Unknown error";
+    }
+  })
+  .catch(error => {
+    analyzeBtn.disabled = false;
+    console.error("Error:", error);
+    document.getElementById("status").innerText = "Error";
+    document.getElementById("verdict").innerText = error.message || "Network error";
+  });
+}
+
+function logout() {
+  const confirmLogout = confirm("Are you sure you want to logout?");
+  if (confirmLogout) {
+    if (window.MaskOff) MaskOff.clearSessionStorageOnly();
+    else sessionStorage.clear();
+    window.location.href = "/logout";
+  }
+}
+</script>
+
+</body>
+</html>

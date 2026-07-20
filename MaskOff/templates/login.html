@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Mask Off Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='maskoff-theme.css') }}">
+<script src="{{ url_for('static', filename='theme.js') }}"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Roboto Slab',serif;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  background:var(--bg, #F5F6FA);
+}
+
+/* HEADER */
+header{
+  position:fixed;
+  top:0;
+  width:100%;
+  background:var(--nav-bg, #5e3c65);
+  color:#fff;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 40px;
+  z-index:1000;
+}
+.brand{display:flex;align-items:center;gap:14px}
+.brand img{height:76px}
+.brand span{font-size:32px;font-weight:800}
+.home-link{color:white;text-decoration:none;font-size:14px}
+
+/* CARD ONLY */
+.card{
+  background:#fff;
+  width:420px;
+  padding:40px;
+  border-radius:12px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.1);
+}
+.card h2{text-align:center;margin-bottom:10px}
+.card p{text-align:center;color:#777;margin-bottom:25px}
+
+input{
+  width:100%;
+  border:none;
+  border-bottom:2px solid #333;
+  padding:12px 0;
+  margin-bottom:20px;
+  font-size:16px;
+  background:transparent;
+}
+
+.options{
+  display:flex;
+  justify-content:space-between;
+  font-size:14px;
+  margin-bottom:20px;
+}
+.options a{color:#742b58;text-decoration:none}
+
+button{
+  width:100%;
+  padding:14px;
+  background:#7f517a;
+  border:none;
+  color:white;
+  font-size:16px;
+  border-radius:6px;
+  cursor:pointer;
+}
+button:hover{background:#5e3c65}
+
+.bottom{
+  text-align:center;
+  margin-top:15px;
+  font-size:14px;
+}
+.bottom a{color:darkred;text-decoration:none}
+.error-msg{
+  background:#fef2f2;
+  color:#b91c1c;
+  padding:12px 14px;
+  border-radius:8px;
+  font-size:14px;
+  margin-bottom:18px;
+  text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="brand">
+     
+    <img src="{{ url_for('static', filename='final logo.png') }}" alt="logo">
+    <span>MASK OFF</span>
+  </div>
+  <a href="/" class="home-link">Home</a>
+</header>
+
+<!-- ONLY LOGIN CARD -->
+<div class="card">
+  <h2>Welcome Back</h2>
+  <p>Login to your account</p>
+
+    {% if error == 'invalid' %}
+  <div class="error-msg">Invalid email or password. Please try again.</div>
+  {% elif error == 'missing' %}
+  <div class="error-msg">Please enter your email and password.</div>
+  {% endif %}
+
+  <form method="POST" action="/api/signin" id="loginForm">
+    <input type="hidden" name="next" id="loginNext" value="{{ request.args.get('next', '') }}">
+    <input type="email" name="email" placeholder="Email Address" required>
+    <input type="password" name="password" placeholder="Password" required>
+
+    <div class="options">
+      <label><input type="checkbox"> Remember me</label>
+      <a href="#">Forgot Password?</a>
+    </div>
+
+    <button type="submit">Login</button>
+
+    <div class="bottom">
+      Not registered? <a href="/signup">Create account</a>
+    </div>
+  </form>
+</div>
+
+</body>
+</html>
