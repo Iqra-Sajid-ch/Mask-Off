@@ -138,11 +138,15 @@ No part of this repository may be copied, redistributed, modified, or used comme
 
 **Iqra Sajid**
 
+## 👤👤 Team Members 
+- Iqra Sajid
+- Tayyaba Sahar 
+
 Bachelor of Science in Information Technology (BSIT)
 
 GitHub: *(Add your GitHub profile link here)*
 
-LinkedIn: *(Add your LinkedIn profile link here)*
+LinkedIn: *linkedin.com/in/iqrasajid78*
 
 ---
 
