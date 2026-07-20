@@ -144,7 +144,7 @@ No part of this repository may be copied, redistributed, modified, or used comme
 
 Bachelor of Science in Information Technology (BSIT)
 
-GitHub: *(Add your GitHub profile link here)*
+GitHub: *(https://github.com/Iqra-Sajid-ch)*
 
 LinkedIn: *linkedin.com/in/iqrasajid78*
 
